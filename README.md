@@ -1,72 +1,415 @@
-# Proyecto Final — MARTÍN
+# 🤖 Proyecto Final — MARTÍN
 
-Este repositorio alberga el código fuente, las configuraciones de entorno y el protocolo de infraestructura correspondientes al **Proyecto Final de Sistemas Operativos II**. La solución implementa un ecosistema distribuido y desacoplado en la nube que actúa como el nodo receptor, validador y persistente de las métricas de telemetría y logs generados de forma asíncrona por el prototipo robótico de laboratorio (**MARTÍN**).
+<div align="center">
 
----
+![Docker](https://img.shields.io/badge/Docker-Containerized-blue?style=for-the-badge&logo=docker)
+![FastAPI](https://img.shields.io/badge/FastAPI-Backend-green?style=for-the-badge&logo=fastapi)
+![MongoDB](https://img.shields.io/badge/MongoDB-NoSQL-success?style=for-the-badge&logo=mongodb)
+![Ubuntu](https://img.shields.io/badge/Ubuntu-24.04-E95420?style=for-the-badge&logo=ubuntu)
+![Nginx](https://img.shields.io/badge/Nginx-Web_Server-009639?style=for-the-badge&logo=nginx)
 
-## 🌐 Información de Despliegue (Producción)
+### Sistema Distribuido de Monitoreo, Persistencia y Telemetría para el Robot MARTÍN
 
-La infraestructura se encuentra completamente aprovisionada y operativa en producción. Con base en los requerimientos formales de la cátedra, el acceso se realiza de forma directa mediante direccionamiento IP nativo sin capas de enmascaramiento DNS:
-
-* **Capa de Presentación (Dashboard Web):** `http://161.35.112.5`
-* **Capa de Lógica de Negocio (REST API Entrypoint):** `http://161.35.112.5:3000`
-
----
-
-## 📐 Diseño de la Arquitectura del Sistema
-
-El sistema rompe con la rigidez de los esquemas monolíticos tradicionales al implementar una **Arquitectura Orientada a Microservicios (SOA)**. El flujo está segmentado en tres capas aisladas, independientes e indivisibles interconectadas mediante una topología de red virtualizada.
-
-![Diagrama Técnico de Arquitectura de Contenedores y Flujo de Datos](image_1.png)
-
-### Mecanismos de Aislamiento y Resiliencia en Redes
-1. **Red Aislada de Tipo Bridge (`red_martin`):** Se implementó un conmutador virtual privado dentro del demonio de Docker. Este canal deniega de forma estricta cualquier exposición o mapeo público del puerto de la base de datos (`27017`) hacia Internet. La API (`lab_backend`) se comunica de forma exclusiva con el motor de persistencia mediante un **DNS interno por resolución de nombre de contenedor** (`mongodb://lab_mongodb:27017`), blindando el almacenamiento de datos contra vectores de ataque externos.
-2. **Políticas de Autogestión de Procesos:** Todos los contenedores han sido inyectados con la directiva operativa `--restart unless-stopped`. Esto transfiere la responsabilidad de la orquestación de disponibilidad al motor nativo de Docker, obligando al host a levantar de forma automática el backend, el frontend y la base de datos inmediatamente tras un reinicio del sistema operativo, garantizando una alta tolerancia a fallos.
+</div>
 
 ---
 
-## 🛠️ Tecnologías y Ecosistema Tecnológico
+# 📖 Descripción General
 
-### Infraestructura y Virtualización OS-Level
-* **Cloud Hosting Provider:** DigitalOcean (Virtual Private Server - Droplet Aprovisionado).
-* **Distribución Host Linux:** Ubuntu Server 24.04.4 LTS (Noble Numbat).
-* **Núcleo del Sistema:** Linux Kernel 6.8.0-31-generic x86_64 architecture.
-* **Motor de Contenedores:** Docker Engine Runtime Environment (Nativo).
+Este repositorio contiene el código fuente, configuraciones de infraestructura y documentación técnica correspondientes al **Proyecto Final de Sistemas Operativos II**.
 
-### Stack de Componentes de Software
-* **Frontend:** Nginx Server (Alpine-lightweight base image), encargado del renderizado estático de la interfaz del Dashboard mediante HTML5 semántico, CSS3 estructurado bajo patrones responsivos y JavaScript asíncrono puro (Fetch API).
-* **Backend:** Python 3.10 + FastAPI Framework. Procesa la lógica transaccional, ejecuta la validación sintáctica de esquemas dinámicos JSON a través de modelos Pydantic y gestiona las políticas permisivas del middleware de Origen Cruzado (CORS).
-* **Base de Datos:** MongoDB NoSQL Engine. Manejo flexible de colecciones orientadas a documentos BSON, vinculada a un volumen persistente mapeado directamente en el disco duro del Host (`proyecto_martin_mongo_data`).
+La solución implementa un ecosistema distribuido y desacoplado desplegado completamente en la nube, encargado de:
+
+- Recepción de métricas de telemetría.
+- Validación de eventos JSON.
+- Persistencia de logs en tiempo real.
+- Visualización web de eventos del robot.
+- Tolerancia a fallos mediante contenedores Docker.
+
+El sistema actúa como nodo receptor y procesador de información generada de forma asíncrona por el prototipo robótico de laboratorio:
+
+# 🤖 MARTÍN
 
 ---
-## 🚀 Instrucciones de Uso y Flujo de Trabajo
 
-Para la administración del sistema, auditorías de código o la demostración presencial del proyecto, siga el flujo operativo estándar detallado a continuación:
+# 🌐 Infraestructura de Producción
 
-### 1. Conexión Remota al Servidor (SSH vía IP Pública)
-Abra la terminal de su computadora local (PowerShell o CMD en Windows, o la Terminal en macOS/Linux) y ejecute el comando de transporte seguro apuntando a la IP pública del Droplet:
+La plataforma se encuentra completamente desplegada y operativa en producción utilizando infraestructura cloud sobre DigitalOcean.
+
+## 🔗 Endpoints Públicos
+
+| Servicio | Endpoint |
+|---|---|
+| 🌍 Dashboard Web | `http://161.35.112.5` |
+| ⚡ REST API Backend | `http://161.35.112.5:3000` |
+
+---
+
+# 🏗️ Arquitectura General del Sistema
+
+La solución rompe con el modelo monolítico tradicional mediante una arquitectura desacoplada basada en microservicios.
+
+## 📌 Componentes Principales
+
+```text
+                    ┌────────────────────┐
+                    │    Robot MARTÍN    │
+                    │  Generación Logs   │
+                    └─────────┬──────────┘
+                              │ JSON
+                              ▼
+                  ┌────────────────────────┐
+                  │     FastAPI Backend    │
+                  │   Validación + API     │
+                  │      Puerto 3000       │
+                  └─────────┬──────────────┘
+                            │
+                            ▼
+                  ┌────────────────────────┐
+                  │       MongoDB          │
+                  │ Persistencia BSON/JSON │
+                  └─────────┬──────────────┘
+                            │
+                            ▼
+                  ┌────────────────────────┐
+                  │     Frontend Nginx     │
+                  │ Dashboard Web HTML/CSS │
+                  │       Puerto 80        │
+                  └────────────────────────┘
+```
+
+---
+
+# 🔐 Mecanismos de Seguridad y Resiliencia
+
+## 🌉 Red Virtual Privada Docker (`red_martin`)
+
+El sistema utiliza una red aislada tipo `bridge` creada dentro del motor Docker.
+
+### Características:
+
+- El puerto de MongoDB (`27017`) NO está expuesto públicamente.
+- La comunicación interna ocurre únicamente mediante DNS interno Docker.
+- El Backend se comunica con MongoDB utilizando:
+
+```text
+mongodb://lab_mongodb:27017
+```
+
+### Beneficios:
+
+- Aislamiento de servicios.
+- Reducción de superficie de ataque.
+- Protección contra accesos externos no autorizados.
+
+---
+
+## ♻️ Recuperación Automática de Servicios
+
+Todos los contenedores utilizan la política:
+
+```bash
+--restart unless-stopped
+```
+
+Esto permite que:
+
+- Los servicios se reinicien automáticamente.
+- El sistema recupere disponibilidad tras reinicios del host.
+- La infraestructura mantenga alta tolerancia a fallos.
+
+---
+
+# 🛠️ Ecosistema Tecnológico
+
+# ☁️ Infraestructura Cloud
+
+| Tecnología | Descripción |
+|---|---|
+| DigitalOcean | VPS Cloud Provider |
+| Ubuntu Server 24.04.4 LTS | Sistema Operativo Host |
+| Linux Kernel 6.8 | Núcleo del Sistema |
+| Docker Engine | Virtualización OS-Level |
+
+---
+
+# 💻 Stack de Software
+
+## 🌐 Frontend
+
+- Nginx Server
+- HTML5
+- CSS3 Responsivo
+- JavaScript Vanilla
+- Fetch API
+
+### Función:
+
+- Visualización de eventos.
+- Dashboard operativo.
+- Comunicación asíncrona con Backend.
+
+---
+
+## ⚡ Backend
+
+- Python 3.10
+- FastAPI Framework
+- Pydantic Validation
+- Middleware CORS
+
+### Función:
+
+- Recepción de telemetría.
+- Validación JSON.
+- Gestión de solicitudes HTTP.
+- Persistencia de eventos.
+
+---
+
+## 🍃 Base de Datos
+
+- MongoDB NoSQL
+- Documentos BSON
+- Volumen persistente Docker
+
+### Volumen Persistente:
+
+```text
+proyecto_martin_mongo_data
+```
+
+---
+
+# 🚀 Protocolo de Uso y Demostración
+
+---
+
+# 🌐 1. Acceso Remoto al Servidor Linux
+
+## 🔑 Conexión SSH
+
+Desde la terminal local:
+
 ```bash
 ssh martin@161.35.112.5
-2. Autenticación e Ingreso de Contraseña (Seguridad de Linux)
-Al dar Enter, el servidor solicitará las credenciales de acceso:
+```
 
-Bash
+---
+
+# 🔐 2. Autenticación
+
+El sistema solicitará la contraseña:
+
+```bash
 martin@161.35.112.5's password:
-⚠️ Nota Crítica de Seguridad: Cuando escriba la contraseña en la terminal, no se va a reflejar ningún carácter en la pantalla (no aparecerán letras, asteriscos ni puntos). Esto es un mecanismo de seguridad nativo de Linux Ubuntu para evitar que alguien vea la longitud de su clave. Simplemente escríbala completa con el teclado y presione Enter.
+```
 
-3. Monitoreo y Verificación del Estado de los Contenedores
-Una vez dentro del servidor, puede verificar en cualquier momento la salud, los sockets de escucha y el tiempo de actividad de los microservicios ejecutando:
+> ⚠️ **Importante:**  
+> Linux NO mostrará caracteres mientras escribe la contraseña.  
+> Esto es completamente normal y forma parte del mecanismo de seguridad del sistema operativo.
 
-Bash
+---
+
+# 🐳 3. Verificación de Contenedores Activos
+
+Ejecute:
+
+```bash
 sudo docker ps
-Este comando devolverá una tabla en vivo. El proyecto está operando correctamente si visualiza los tres contenedores (lab_frontend, lab_backend y lab_mongodb) reportando el estado Up en la columna STATUS.
+```
 
-4. Inspección de Logs en Tiempo Real (Flujo del Robot)
-Para comprobar que el robot MARTÍN (o los scripts de telemetría) están enviando los eventos con éxito y que el backend los está procesando de forma asíncrona, ejecute el comando de escucha activa:
+## ✅ Resultado Esperado
 
-Bash
+| CONTAINER ID | IMAGE | STATUS | NAMES |
+|---|---|---|---|
+| xxx | frontend | Up | lab_frontend |
+| xxx | backend | Up | lab_backend |
+| xxx | mongodb | Up | lab_mongodb |
+
+---
+
+# 🧪 Simulación de Tolerancia a Fallos
+
+---
+
+# 🟢 Escenario A — Detener Backend
+
+## 🔻 Comando
+
+```bash
+sudo docker stop lab_backend
+```
+
+---
+
+## ⚙️ Resultado Esperado
+
+- El Frontend sigue operativo.
+- El Dashboard permanece accesible.
+- Se despliega el mensaje:
+
+```text
+⚠️ Error al conectar con el Backend de Logs
+```
+
+---
+
+## 🔄 Restaurar Servicio
+
+```bash
+sudo docker start lab_backend
+```
+
+---
+
+# 🔵 Escenario B — Detener MongoDB
+
+## 🔻 Comando
+
+```bash
+sudo docker stop lab_mongodb
+```
+
+---
+
+## ⚙️ Resultado Esperado
+
+- FastAPI continúa activo.
+- El Backend recibe eventos JSON.
+- La persistencia falla temporalmente.
+
+### Código HTTP Esperado
+
+```http
+HTTP 500 - Internal Server Error
+```
+
+---
+
+## 🔄 Restaurar Servicio
+
+```bash
+sudo docker start lab_mongodb
+```
+
+---
+
+# 🔴 Escenario C — Detener Frontend
+
+## 🔻 Comando
+
+```bash
+sudo docker stop lab_frontend
+```
+
+---
+
+## ⚙️ Resultado Esperado
+
+La URL:
+
+```text
+http://161.35.112.5
+```
+
+dejará de responder.
+
+Sin embargo:
+
+- Backend continúa operativo.
+- MongoDB continúa activo.
+- El robot sigue enviando eventos.
+
+---
+
+## 📜 Monitor de Logs en Tiempo Real
+
+```bash
 sudo docker logs -f lab_backend
-Presione Ctrl + C en su teclado cuando desee salir de la vista de logs y regresar a la consola ordinaria.
+```
 
+### Resultado Esperado
 
+```text
+HTTP 200 OK
+```
+
+> 📌 Presione `CTRL + C` para salir.
+
+---
+
+## 🔄 Restaurar Servicio
+
+```bash
+sudo docker start lab_frontend
+```
+
+---
+
+# 📂 Estructura General del Proyecto
+
+```text
+Proyecto-Martin/
+│
+├── backend/
+│   ├── app/
+│   ├── requirements.txt
+│   └── Dockerfile
+│
+├── frontend/
+│   ├── index.html
+│   ├── style.css
+│   ├── script.js
+│   └── Dockerfile
+│
+├── mongodb/
+│
+├── docker-compose.yml
+│
+└── README.md
+```
+
+---
+
+# 📊 Características Técnicas Implementadas
+
+- ✅ Arquitectura basada en microservicios.
+- ✅ Virtualización mediante Docker.
+- ✅ Persistencia desacoplada.
+- ✅ API REST asíncrona.
+- ✅ Comunicación JSON.
+- ✅ Validación dinámica con Pydantic.
+- ✅ Dashboard Web en tiempo real.
+- ✅ Recuperación automática de servicios.
+- ✅ Aislamiento de red interna.
+- ✅ Tolerancia a fallos distribuida.
+
+---
+
+# 🔥 Validaciones Académicas Cubiertas
+
+Este proyecto demuestra exitosamente:
+
+- Administración de servicios Linux.
+- Despliegue Cloud.
+- Virtualización OS-Level.
+- Contenedorización Docker.
+- Redes virtuales Docker.
+- Persistencia NoSQL.
+- Arquitecturas distribuidas.
+- Manejo de tolerancia a fallos.
+- Recuperación automática de servicios.
+- Comunicación cliente-servidor.
+- Diseño desacoplado SOA.
+
+---
+
+# 👨‍💻 Autor
+
+## Proyecto Final — Sistemas Operativos II
+
+Desarrollado como solución académica para la implementación de una arquitectura distribuida tolerante a fallos aplicada al robot de laboratorio:
+
+# 🤖 MARTÍN
 
