@@ -1,4 +1,4 @@
-# Sistema de Telemetría y Registro Centralizado de Eventos — Proyecto MARTÍN
+# Proyecto Final — Proyecto MARTÍN
 
 [![Stack](https://img.shields.io/badge/Architecture-Microservices-blue.svg)](#-diseño-de-la-arquitectura-del-sistema)
 [![Environment](https://img.shields.io/badge/Environment-Cloud--Production-green.svg)](#-información-de-despliegue-producción)
