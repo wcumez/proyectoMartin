@@ -39,38 +39,34 @@ El sistema rompe con la rigidez de los esquemas monolíticos tradicionales al im
 * **Base de Datos:** MongoDB NoSQL Engine. Manejo flexible de colecciones orientadas a documentos BSON, vinculada a un volumen persistente mapeado directamente en el disco duro del Host (`proyecto_martin_mongo_data`).
 
 ---
+## 🚀 Instrucciones de Uso y Flujo de Trabajo
 
-## 🚀 Guía de Operación y Runbook de Infraestructura
+Para la administración del sistema, auditorías de código o la demostración presencial del proyecto, siga el flujo operativo estándar detallado a continuación:
 
-### 1. Acceso de Administración Remota (Secured Shell)
-Para auditorías de código o inspección en vivo de la terminal por parte del equipo técnico:
+### 1. Conexión Remota al Servidor (SSH vía IP Pública)
+Abra la terminal de su computadora local (PowerShell o CMD en Windows, o la Terminal en macOS/Linux) y ejecute el comando de transporte seguro apuntando a la IP pública del Droplet:
 ```bash
 ssh martin@161.35.112.5
-2. Despliegue de la Topología desde Cero (Cold Start)En caso de requerir la reconstrucción total de las capas del sistema dentro del servidor, ejecute la siguiente secuencia secuencial de comandos:Bash# Inicializar el canal de comunicación privado
-sudo docker network create red_martin 2>/dev/null
+2. Autenticación e Ingreso de Contraseña (Seguridad de Linux)
+Al dar Enter, el servidor solicitará las credenciales de acceso:
 
-# Instanciar Capa de Persistencia con almacenamiento persistente
-sudo docker run -d --name lab_mongodb --network red_martin -v proyecto_martin_mongo_data:/data/db mongo:latest
+Bash
+martin@161.35.112.5's password:
+⚠️ Nota Crítica de Seguridad: Cuando escriba la contraseña en la terminal, no se va a reflejar ningún carácter en la pantalla (no aparecerán letras, asteriscos ni puntos). Esto es un mecanismo de seguridad nativo de Linux Ubuntu para evitar que alguien vea la longitud de su clave. Simplemente escríbala completa con el teclado y presione Enter.
 
-# Instanciar Capa Lógica (API REST) enlazada al entorno
-sudo docker run -d --name lab_backend --network red_martin -p 3000:3000 -e MONGO_URI=mongodb://lab_mongodb:27017/logs_robotica martin_backend
+3. Monitoreo y Verificación del Estado de los Contenedores
+Una vez dentro del servidor, puede verificar en cualquier momento la salud, los sockets de escucha y el tiempo de actividad de los microservicios ejecutando:
 
-# Instanciar Capa de Presentación (Servidor Web Nginx)
-sudo docker run -d --name lab_frontend --network red_martin -p 80:80 martin_frontend
-3. Diagnóstico y Monitoreo de Recursos en Tiempo RealHerramientas críticas para la validación del comportamiento de la infraestructura durante la defensa presencial:Bash# Validar sockets de escucha, IDs de proceso y mapeo de puertos activos
+Bash
 sudo docker ps
+Este comando devolverá una tabla en vivo. El proyecto está operando correctamente si visualiza los tres contenedores (lab_frontend, lab_backend y lab_mongodb) reportando el estado Up en la columna STATUS.
 
-# Monitorear consumo porcentual de CPU, Memoria RAM y rendimiento de Red I/O
-sudo docker stats
+4. Inspección de Logs en Tiempo Real (Flujo del Robot)
+Para comprobar que el robot MARTÍN (o los scripts de telemetría) están enviando los eventos con éxito y que el backend los está procesando de forma asíncrona, ejecute el comando de escucha activa:
 
-# Inspección y flujo continuo de la salida estándar (Logs de depuración del Backend)
+Bash
 sudo docker logs -f lab_backend
-4. Control del Ciclo de Vida del EcosistemaBash# Interrupción controlada de la ejecución de los servicios (Graceful Shutdown)
-sudo docker stop lab_frontend lab_backend lab_mongodb
+Presione Ctrl + C en su teclado cuando desee salir de la vista de logs y regresar a la consola ordinaria.
 
-# Inicialización en caliente de contenedores persistidos en el sistema
-sudo docker start lab_mongodb lab_backend lab_frontend
 
-# Forzar reinicio de hilos de ejecución en la API de FastAPI
-sudo docker restart lab_backend
-📊 Matriz de Simulación de Escenarios de Tolerancia a Fallos (Rúbrica)Durante la demostración técnica ante el docente evaluador, la estabilidad de los microservicios y el desacoplamiento se corroborarán mediante la ejecución del siguiente protocolo de contingencia:Escenario de ValidaciónEjecución en ConsolaComportamiento Técnico EsperadoAislamiento Absoluto del Backendsudo docker stop lab_backendEl microservicio lab_frontend (Nginx - Puerto 80) permanece en línea sirviendo los componentes web estáticos. No obstante, la interfaz detecta la pérdida del socket y despliega de forma reactiva un banner de alerta controlado: "⚠️ Error al conectar con el Backend de Logs". No se registran nuevos eventos en el sistema.Falla Crítica en Capa de Datos (Persistencia)sudo docker stop lab_mongodbEl backend (FastAPI - Puerto 3000) continúa receptivo ante las tramas JSON transmitidas por el robot. Al intentar procesar la transacción, los bloques de control try/except interceptan la falta de comunicación con la base de datos y devuelven al cliente una respuesta estructurada con código de Estado HTTP 500 (Internal Server Error), evitando el colapso del servicio de red.Caída Total del Sistema de Presentaciónsudo docker stop lab_frontendEl acceso web al Dashboard a través del puerto HTTP estándar queda fuera de servicio (Generando un error de Timeout en navegadores). Sin embargo, la lógica de adquisición (Puerto 3000) y MongoDB siguen funcionando en segundo plano de manera ininterrumpida. Los flujos de telemetría entrantes procesan y guardan los logs con éxito retornando un código de Estado HTTP 200 (OK).Normalización y Sincronía del Entornosudo docker start [contenedor]El contenedor afectado recobra instantáneamente su ejecución y se acopla de forma transparente a la red red_martin. El Dashboard web restablece el flujo asíncrono y actualiza las tablas cronológicas automáticamente sin requerir reinicios globales del servidor.
+
