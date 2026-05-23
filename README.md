@@ -338,31 +338,6 @@ HTTP 200 OK
 ```bash
 sudo docker start lab_frontend
 ```
-
----
-
-# 📂 Estructura General del Proyecto
-
-```text
-Proyecto-Martin/
-│
-├── backend/
-│   ├── app/
-│   ├── requirements.txt
-│   └── Dockerfile
-│
-├── frontend/
-│   ├── index.html
-│   ├── style.css
-│   ├── script.js
-│   └── Dockerfile
-│
-├── mongodb/
-│
-├── docker-compose.yml
-│
-└── README.md
-```
 ---
 Desarrollado como solución académica para la implementación de una arquitectura distribuida tolerante a fallos aplicada al robot de laboratorio:
 
