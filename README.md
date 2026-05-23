@@ -363,46 +363,7 @@ Proyecto-Martin/
 │
 └── README.md
 ```
-
 ---
-
-# 📊 Características Técnicas Implementadas
-
-- ✅ Arquitectura basada en microservicios.
-- ✅ Virtualización mediante Docker.
-- ✅ Persistencia desacoplada.
-- ✅ API REST asíncrona.
-- ✅ Comunicación JSON.
-- ✅ Validación dinámica con Pydantic.
-- ✅ Dashboard Web en tiempo real.
-- ✅ Recuperación automática de servicios.
-- ✅ Aislamiento de red interna.
-- ✅ Tolerancia a fallos distribuida.
-
----
-
-# 🔥 Validaciones Académicas Cubiertas
-
-Este proyecto demuestra exitosamente:
-
-- Administración de servicios Linux.
-- Despliegue Cloud.
-- Virtualización OS-Level.
-- Contenedorización Docker.
-- Redes virtuales Docker.
-- Persistencia NoSQL.
-- Arquitecturas distribuidas.
-- Manejo de tolerancia a fallos.
-- Recuperación automática de servicios.
-- Comunicación cliente-servidor.
-- Diseño desacoplado SOA.
-
----
-
-# 👨‍💻 Autor
-
-## Proyecto Final — Sistemas Operativos II
-
 Desarrollado como solución académica para la implementación de una arquitectura distribuida tolerante a fallos aplicada al robot de laboratorio:
 
 # 🤖 MARTÍN
