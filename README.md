@@ -1,12 +1,6 @@
 # 🤖 Proyecto Final — MARTÍN
 
-<div align="center">
 
-![Docker](https://img.shields.io/badge/Docker-Containerized-blue?style=for-the-badge&logo=docker)
-![FastAPI](https://img.shields.io/badge/FastAPI-Backend-green?style=for-the-badge&logo=fastapi)
-![MongoDB](https://img.shields.io/badge/MongoDB-NoSQL-success?style=for-the-badge&logo=mongodb)
-![Ubuntu](https://img.shields.io/badge/Ubuntu-24.04-E95420?style=for-the-badge&logo=ubuntu)
-![Nginx](https://img.shields.io/badge/Nginx-Web_Server-009639?style=for-the-badge&logo=nginx)
 
 ### Sistema Distribuido de Monitoreo, Persistencia y Telemetría para el Robot MARTÍN
 
