@@ -1,9 +1,5 @@
 # Proyecto Final — MARTÍN
 
-[![Stack](https://img.shields.io/badge/Architecture-Microservices-blue.svg)](#-diseño-de-la-arquitectura-del-sistema)
-[![Environment](https://img.shields.io/badge/Environment-Cloud--Production-green.svg)](#-información-de-despliegue-producción)
-[![Infrastructure](https://img.shields.io/badge/Infrastructure-Docker--Native-orange.svg)](#-tecnologías-y-ecosistema-tecnológico)
-
 Este repositorio alberga el código fuente, las configuraciones de entorno y el protocolo de infraestructura correspondientes al **Proyecto Final de Sistemas Operativos II**. La solución implementa un ecosistema distribuido y desacoplado en la nube que actúa como el nodo receptor, validador y persistente de las métricas de telemetría y logs generados de forma asíncrona por el prototipo robótico de laboratorio (**MARTÍN**).
 
 ---
